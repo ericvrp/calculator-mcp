@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { version } from "../package.json";
+import { Decimal } from "decimal.js";
 
 /**
  * Create an MCP server with calculator tools.
@@ -18,9 +19,12 @@ server.tool(
     numbers: z.array(z.number()).describe("An array of numbers to add"),
   },
   async ({ numbers }) => {
-    const result = numbers.reduce((sum, num) => sum + num, 0);
+    let result = new Decimal(0);
+    for (const num of numbers) {
+      result = result.plus(new Decimal(num));
+    }
     return {
-      content: [{ type: "text", text: String(result) }],
+      content: [{ type: "text", text: result.toString() }],
     };
   }
 );
@@ -35,9 +39,13 @@ server.tool(
     if (numbers.length === 0) {
       throw new Error("Subtraction requires at least one number");
     }
-    const result = numbers.slice(1).reduce((acc, num) => acc - num, numbers[0]);
+    const decimalNumbers = numbers.map((num) => new Decimal(num));
+    let result = decimalNumbers[0];
+    for (let i = 1; i < decimalNumbers.length; i++) {
+      result = result.minus(decimalNumbers[i]);
+    }
     return {
-      content: [{ type: "text", text: String(result) }],
+      content: [{ type: "text", text: result.toString() }],
     };
   }
 );
@@ -49,9 +57,12 @@ server.tool(
     numbers: z.array(z.number()).describe("An array of numbers to multiply"),
   },
   async ({ numbers }) => {
-    const result = numbers.reduce((product, num) => product * num, 1);
+    let result = new Decimal(1);
+    for (const num of numbers) {
+      result = result.times(new Decimal(num));
+    }
     return {
-      content: [{ type: "text", text: String(result) }],
+      content: [{ type: "text", text: result.toString() }],
     };
   }
 );
@@ -72,9 +83,34 @@ server.tool(
         content: [{ type: "text", text: "Cannot divide by zero" }],
       };
     }
-    const result = denominators.reduce((acc, num) => acc / num, numerator);
+    const [numeratorDecimal, ...denominatorsDecimal] = numbers.map(
+      (num) => new Decimal(num)
+    );
+    let result = numeratorDecimal;
+    for (const num of denominatorsDecimal) {
+      if (num.isZero()) {
+        return {
+          content: [{ type: "text", text: "Cannot divide by zero" }],
+        };
+      }
+      result = result.dividedBy(num);
+    }
     return {
-      content: [{ type: "text", text: String(result) }],
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Set precision tool
+server.tool(
+  "set_precision",
+  {
+    precision: z.number().describe("The number of decimal places to use"),
+  },
+  async ({ precision }) => {
+    Decimal.set({ precision });
+    return {
+      content: [{ type: "text", text: `Precision set to ${precision}` }],
     };
   }
 );

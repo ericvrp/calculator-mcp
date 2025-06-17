@@ -1,13 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { version } from "../package.json";
 
 /**
  * Create an MCP server with calculator tools.
  */
 const server = new McpServer({
   name: "Calculator", // Match server_name in tests
-  version: "0.2.0",
+  version: version,
 });
 
 // Add tool

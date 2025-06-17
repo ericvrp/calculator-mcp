@@ -1,129 +1,82 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
 /**
- * Create an MCP server with capabilities for tools (for calculator operations).
+ * Create an MCP server with calculator tools.
  */
-const server = new Server(
+const server = new McpServer({
+  name: "Calculator", // Match server_name in tests
+  version: "0.2.0",
+});
+
+// Add tool
+server.tool(
+  "add",
   {
-    name: "Calculator MCP",
-    version: "0.1.0",
+    numbers: z.array(z.number()).describe("An array of numbers to add"),
   },
-  {
-    capabilities: {
-      resources: {},
-      tools: {},
-      prompts: {},
-    },
+  async ({ numbers }) => {
+    const result = numbers.reduce((sum, num) => sum + num, 0);
+    return {
+      content: [{ type: "text", text: String(result) }],
+    };
   }
 );
 
-/**
- * Handler that lists available tools.
- * Exposes calculator tools (add, subtract, multiply, divide).
- */
-server.setRequestHandler(ListToolsRequestSchema, async () => {
-  return {
-    tools: [
-      {
-        name: "add",
-        description: "Adds two numbers",
-        inputSchema: {
-          type: "object",
-          properties: {
-            a: { type: "number", description: "First number" },
-            b: { type: "number", description: "Second number" },
-          },
-          required: ["a", "b"],
-        },
-      },
-      {
-        name: "subtract",
-        description: "Subtracts two numbers",
-        inputSchema: {
-          type: "object",
-          properties: {
-            a: { type: "number", description: "First number" },
-            b: { type: "number", description: "Second number" },
-          },
-          required: ["a", "b"],
-        },
-      },
-      {
-        name: "multiply",
-        description: "Multiplies two numbers",
-        inputSchema: {
-          type: "object",
-          properties: {
-            a: { type: "number", description: "First number" },
-            b: { type: "number", description: "Second number" },
-          },
-          required: ["a", "b"],
-        },
-      },
-      {
-        name: "divide",
-        description: "Divides two numbers",
-        inputSchema: {
-          type: "object",
-          properties: {
-            a: { type: "number", description: "Numerator" },
-            b: { type: "number", description: "Denominator" },
-          },
-          required: ["a", "b"],
-        },
-      },
-    ],
-  };
-});
-
-/**
- * Handler for calculator tools.
- * Performs the requested operation (add, subtract, multiply, divide) on two numbers.
- */
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const a = Number(request.params.arguments?.a);
-  const b = Number(request.params.arguments?.b);
-
-  if (isNaN(a) || isNaN(b)) {
-    throw new Error("Both inputs must be numbers.");
+// Subtract tool
+server.tool(
+  "subtract",
+  {
+    numbers: z.array(z.number()).describe("An array of numbers to subtract"),
+  },
+  async ({ numbers }) => {
+    if (numbers.length === 0) {
+      throw new Error("Subtraction requires at least one number");
+    }
+    const result = numbers.slice(1).reduce((acc, num) => acc - num, numbers[0]);
+    return {
+      content: [{ type: "text", text: String(result) }],
+    };
   }
+);
 
-  let result: number;
-  switch (request.params.name) {
-    case "add":
-      result = a + b;
-      break;
-    case "subtract":
-      result = a - b;
-      break;
-    case "multiply":
-      result = a * b;
-      break;
-    case "divide":
-      if (b === 0) {
-        throw new Error("Division by zero is not allowed.");
-      }
-      result = a / b;
-      break;
-    default:
-      throw new Error("Unknown tool");
+// Multiply tool
+server.tool(
+  "multiply",
+  {
+    numbers: z.array(z.number()).describe("An array of numbers to multiply"),
+  },
+  async ({ numbers }) => {
+    const result = numbers.reduce((product, num) => product * num, 1);
+    return {
+      content: [{ type: "text", text: String(result) }],
+    };
   }
+);
 
-  return {
-    content: [
-      {
-        type: "text",
-        text: String(result),
-      },
-    ],
-  };
-});
+// Divide tool
+server.tool(
+  "divide",
+  {
+    numbers: z.array(z.number()).describe("An array of numbers to divide"),
+  },
+  async ({ numbers }) => {
+    if (numbers.length < 2) {
+      throw new Error("Division requires at least two numbers");
+    }
+    const [numerator, ...denominators] = numbers;
+    if (denominators.some((d) => d === 0)) {
+      return {
+        content: [{ type: "text", text: "Cannot divide by zero" }],
+      };
+    }
+    const result = denominators.reduce((acc, num) => acc / num, numerator);
+    return {
+      content: [{ type: "text", text: String(result) }],
+    };
+  }
+);
 
 /**
  * Start the server using stdio transport.
@@ -138,3 +91,5 @@ main().catch((error) => {
   console.error("Server error:", error);
   process.exit(1);
 });
+
+export { server };

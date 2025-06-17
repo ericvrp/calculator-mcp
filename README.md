@@ -27,12 +27,6 @@ Install dependencies:
 bun install
 ```
 
-Build the server:
-
-```bash
-bun run build
-```
-
 For development with auto-rebuild:
 
 ```bash
@@ -50,7 +44,7 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 {
   "mcpServers": {
     "Calculator": {
-      "command": "/path/to/calculator-mcp/build/index.js"
+      "command": "/path/to/calculator-mcp/src/index.ts"
     }
   }
 }

@@ -1,15 +1,15 @@
 {
   "name": "calculator-mcp",
   "version": "0.1.0",
+  "devDependencies": {},
   "description": "A simple calculator MCP server",
   "private": true,
-  "type": "module",
   "scripts": {
     "inspector": "bunx @modelcontextprotocol/inspector src/index.ts",
     "start": "bun ./src/index.ts"
   },
+  "type": "module",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.6.0"
-  },
-  "devDependencies": {}
+    "@modelcontextprotocol/sdk": "^1.12.3"
+  }
 }

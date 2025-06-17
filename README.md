@@ -1,45 +1,42 @@
-# Calculator MCP MCP Server
+# Calculator MCP Server
 
-A simple calculator MCP server
+A simple calculator MCP server that provides basic arithmetic tools.
 
-This is a TypeScript-based MCP server that implements a simple notes system. It demonstrates core MCP concepts by providing:
+This is a TypeScript-based MCP server that implements a simple calculator. It demonstrates core MCP concepts by providing:
 
-- Resources representing text notes with URIs and metadata
-- Tools for creating new notes
-- Prompts for generating summaries of notes
+- Tools for performing arithmetic operations
 
 ## Features
 
-### Resources
-- List and access notes via `note://` URIs
-- Each note has a title, content and metadata
-- Plain text mime type for simple content access
-
 ### Tools
-- `create_note` - Create new text notes
-  - Takes title and content as required parameters
-  - Stores note in server state
 
-### Prompts
-- `summarize_notes` - Generate a summary of all stored notes
-  - Includes all note contents as embedded resources
-  - Returns structured prompt for LLM summarization
+- `add` - Adds two numbers
+  - Takes `a` and `b` as required number parameters
+- `subtract` - Subtracts two numbers
+  - Takes `a` and `b` as required number parameters
+- `multiply` - Multiplies two numbers
+  - Takes `a` and `b` as required number parameters
+- `divide` - Divides two numbers
+  - Takes `a` (numerator) and `b` (denominator) as required number parameters
 
 ## Development
 
 Install dependencies:
+
 ```bash
-npm install
+bun install
 ```
 
 Build the server:
+
 ```bash
-npm run build
+bun run build
 ```
 
 For development with auto-rebuild:
+
 ```bash
-npm run watch
+bun run watch
 ```
 
 ## Installation
@@ -52,8 +49,8 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 ```json
 {
   "mcpServers": {
-    "Calculator MCP": {
-      "command": "/path/to/Calculator MCP/build/index.js"
+    "Calculator": {
+      "command": "/path/to/calculator-mcp/build/index.js"
     }
   }
 }
@@ -64,7 +61,7 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 Since MCP servers communicate over stdio, debugging can be challenging. We recommend using the [MCP Inspector](https://github.com/modelcontextprotocol/inspector), which is available as a package script:
 
 ```bash
-npm run inspector
+bun run inspector
 ```
 
 The Inspector will provide a URL to access debugging tools in your browser.

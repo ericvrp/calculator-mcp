@@ -12,6 +12,7 @@ const NumbersArraySchema = z
 
 const AnglesArraySchema = z
   .array(z.number())
+  .min(1)
   .describe("An array of angle values");
 
 const ModeEnumSchema = z

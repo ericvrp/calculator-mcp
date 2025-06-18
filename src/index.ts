@@ -16,7 +16,9 @@ const AnglesArraySchema = z
 
 const ModeEnumSchema = z
   .enum(["radians", "degrees"])
-  .describe("The angle mode (radians or degrees)");
+  .optional()
+  .default("radians")
+  .describe("The angle mode (radians or degrees), defaults to radians");
 
 const ValuesArraySchema = z.array(z.number()).describe("An array of values");
 

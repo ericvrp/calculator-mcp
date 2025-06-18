@@ -1,8 +1,6 @@
 import { expect, test, describe, beforeEach } from "bun:test";
-import { server } from "../index.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { Decimal } from "decimal.js";
 
 type Schema = Record<string, any>;
@@ -223,6 +221,43 @@ describe("Calculator MCP Server with Decimal.js", () => {
           arguments: { values: [0.5, 1] },
         })
       ).rejects.toThrow("Domain error: input value must be between -1 and 1");
+    });
+
+    test("should default to radians when no mode is provided", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "sin",
+        arguments: { angles: [Math.PI / 2] },
+      });
+      expect(result).toBe(JSON.stringify(["1"]));
+    });
+
+    test("should handle radians mode explicitly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "sin",
+        arguments: { angles: [Math.PI / 2], mode: "radians" },
+      });
+      expect(result).toBe(JSON.stringify(["1"]));
+    });
+
+    test("should handle degrees mode correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "sin",
+        arguments: { angles: [90], mode: "degrees" },
+      });
+      expect(result).toBe(JSON.stringify(["1"]));
+    });
+
+    test("should throw an error for an illegal mode", async () => {
+      await expect(
+        use_mcp_tool({
+          server_name: "Calculator",
+          tool_name: "sin",
+          arguments: { angles: [90], mode: "invalid_mode" },
+        })
+      ).rejects.toThrow();
     });
   });
 

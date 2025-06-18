@@ -50,6 +50,149 @@ async function use_mcp_tool(args: {
 }
 
 describe("Calculator MCP Server with Decimal.js", () => {
+  describe("Trigonometric Functions", () => {
+    // Basic trigonometric functions
+    test("should calculate sine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "sin",
+        arguments: { angle: Math.PI / 2, mode: "radians" },
+      });
+      expect(result).toBe("1");
+    });
+
+    test("should calculate cosine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "cos",
+        arguments: { angle: 0, mode: "radians" },
+      });
+      expect(result).toBe("1");
+    });
+
+    test("should calculate tangent correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "tan",
+        arguments: { angle: Math.PI / 4, mode: "radians" },
+      });
+      expect(result).toBe("1");
+    });
+
+    // Inverse trigonometric functions
+    test("should calculate arcsine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "asin",
+        arguments: { value: 1 },
+      });
+      expect(result).toBe("1.570796326794897");
+    });
+
+    test("should calculate arccosine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "acos",
+        arguments: { value: 0 },
+      });
+      expect(result).toBe("1.570796326794897");
+    });
+
+    test("should calculate arctangent correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "atan",
+        arguments: { value: 1 },
+      });
+      expect(result).toBe("0.785398163397448");
+    });
+
+    // Hyperbolic functions
+    test("should calculate hyperbolic sine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "sinh",
+        arguments: { value: 0 },
+      });
+      expect(result).toBe("0");
+    });
+
+    test("should calculate hyperbolic cosine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "cosh",
+        arguments: { value: 0 },
+      });
+      expect(result).toBe("1");
+    });
+
+    test("should calculate hyperbolic tangent correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "tanh",
+        arguments: { value: 0 },
+      });
+      expect(result).toBe("0");
+    });
+
+    // Inverse hyperbolic functions
+    test("should calculate inverse hyperbolic sine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "asinh",
+        arguments: { value: 0 },
+      });
+      expect(result).toBe("0");
+    });
+
+    test("should calculate inverse hyperbolic cosine correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "acosh",
+        arguments: { value: 1 },
+      });
+      expect(result).toBe("0");
+    });
+
+    test("should calculate inverse hyperbolic tangent correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "atanh",
+        arguments: { value: 0 },
+      });
+      expect(result).toBe("0");
+    });
+
+    // Special cases and error handling
+    test("should handle invalid domain for arcsine", async () => {
+      await expect(
+        use_mcp_tool({
+          server_name: "Calculator",
+          tool_name: "asin",
+          arguments: { value: 2 },
+        })
+      ).rejects.toThrow("Domain error: input value must be between -1 and 1");
+    });
+
+    test("should handle degree mode correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "sin",
+        arguments: { angle: 90, mode: "degrees" },
+      });
+      expect(result).toBe("1");
+    });
+
+    test("should handle special angles correctly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "cos",
+        arguments: { angle: 60, mode: "degrees" },
+      });
+      expect(result).toBe("0.5");
+    });
+  });
+
   // Reset precision before each test
   beforeEach(() => {
     Decimal.set({ precision: 20 }); // Default precision

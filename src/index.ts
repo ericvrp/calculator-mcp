@@ -5,6 +5,20 @@ import { version } from "../package.json";
 import { Decimal } from "decimal.js";
 
 /**
+ * Convert degrees to radians
+ */
+function degreesToRadians(degrees: number): Decimal {
+  return new Decimal(degrees).times(Decimal.acos(-1)).dividedBy(180);
+}
+
+/**
+ * Convert radians to degrees
+ */
+function radiansToDegrees(radians: number): Decimal {
+  return new Decimal(radians).times(180).dividedBy(Decimal.acos(-1));
+}
+
+/**
  * Create an MCP server with calculator tools.
  */
 const server = new McpServer({
@@ -95,6 +109,226 @@ server.tool(
       }
       result = result.dividedBy(num);
     }
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Sine function
+server.tool(
+  "sin",
+  {
+    angle: z.number().describe("The angle value"),
+    mode: z
+      .enum(["radians", "degrees"])
+      .describe("The angle mode (radians or degrees)"),
+  },
+  async ({ angle, mode }) => {
+    let angleInRadians =
+      mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
+    const result = roundTrigResult(Decimal.sin(angleInRadians));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Cosine function
+server.tool(
+  "cos",
+  {
+    angle: z.number().describe("The angle value"),
+    mode: z
+      .enum(["radians", "degrees"])
+      .describe("The angle mode (radians or degrees)"),
+  },
+  async ({ angle, mode }) => {
+    let angleInRadians =
+      mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
+    const result = roundTrigResult(Decimal.cos(angleInRadians));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Tangent function
+server.tool(
+  "tan",
+  {
+    angle: z.number().describe("The angle value"),
+    mode: z
+      .enum(["radians", "degrees"])
+      .describe("The angle mode (radians or degrees)"),
+  },
+  async ({ angle, mode }) => {
+    let angleInRadians =
+      mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
+    const cos = Decimal.cos(angleInRadians);
+
+    // Check for undefined tangent at π/2 + nπ
+    if (cos.isZero()) {
+      return {
+        content: [{ type: "text", text: "Undefined (angle is π/2 + nπ)" }],
+      };
+    }
+
+    const sin = Decimal.sin(angleInRadians);
+    const result = roundTrigResult(sin.dividedBy(cos));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+/**
+ * Round a decimal value to a reasonable precision to match JavaScript Math functions
+ */
+function roundTrigResult(value: Decimal): Decimal {
+  return value.toDecimalPlaces(15);
+}
+
+// Arc sine function
+server.tool(
+  "asin",
+  {
+    value: z.number().describe("The value to calculate arcsine for"),
+  },
+  async ({ value }) => {
+    if (Math.abs(value) > 1) {
+      throw new Error("Domain error: input value must be between -1 and 1");
+    }
+    const result = roundTrigResult(Decimal.asin(new Decimal(value)));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Arc cosine function
+server.tool(
+  "acos",
+  {
+    value: z.number().describe("The value to calculate arccosine for"),
+  },
+  async ({ value }) => {
+    if (Math.abs(value) > 1) {
+      throw new Error("Domain error: input value must be between -1 and 1");
+    }
+    const result = roundTrigResult(Decimal.acos(new Decimal(value)));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Arc tangent function
+server.tool(
+  "atan",
+  {
+    value: z.number().describe("The value to calculate arctangent for"),
+  },
+  async ({ value }) => {
+    const result = roundTrigResult(Decimal.atan(new Decimal(value)));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Hyperbolic sine function
+server.tool(
+  "sinh",
+  {
+    value: z.number().describe("The value to calculate hyperbolic sine for"),
+  },
+  async ({ value }) => {
+    const result = roundTrigResult(Decimal.sinh(new Decimal(value)));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Hyperbolic cosine function
+server.tool(
+  "cosh",
+  {
+    value: z.number().describe("The value to calculate hyperbolic cosine for"),
+  },
+  async ({ value }) => {
+    const result = roundTrigResult(Decimal.cosh(new Decimal(value)));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Hyperbolic tangent function
+server.tool(
+  "tanh",
+  {
+    value: z.number().describe("The value to calculate hyperbolic tangent for"),
+  },
+  async ({ value }) => {
+    const result = roundTrigResult(Decimal.tanh(new Decimal(value)));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Inverse hyperbolic sine function
+server.tool(
+  "asinh",
+  {
+    value: z
+      .number()
+      .describe("The value to calculate inverse hyperbolic sine for"),
+  },
+  async ({ value }) => {
+    const result = Decimal.asinh(new Decimal(value));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Inverse hyperbolic cosine function
+server.tool(
+  "acosh",
+  {
+    value: z
+      .number()
+      .describe("The value to calculate inverse hyperbolic cosine for"),
+  },
+  async ({ value }) => {
+    if (value < 1) {
+      throw new Error(
+        "Domain error: input value must be greater than or equal to 1"
+      );
+    }
+    const result = roundTrigResult(Decimal.acosh(new Decimal(value)));
+    return {
+      content: [{ type: "text", text: result.toString() }],
+    };
+  }
+);
+
+// Inverse hyperbolic tangent function
+server.tool(
+  "atanh",
+  {
+    value: z
+      .number()
+      .describe("The value to calculate inverse hyperbolic tangent for"),
+  },
+  async ({ value }) => {
+    if (Math.abs(value) >= 1) {
+      throw new Error("Domain error: input value must be between -1 and 1");
+    }
+    const result = roundTrigResult(Decimal.atanh(new Decimal(value)));
     return {
       content: [{ type: "text", text: result.toString() }],
     };

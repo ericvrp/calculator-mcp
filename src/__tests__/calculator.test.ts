@@ -1,8 +1,6 @@
 import { expect, test, describe, beforeEach } from "bun:test";
-import { server } from "../index.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { Decimal } from "decimal.js";
 
 type Schema = Record<string, any>;
@@ -52,144 +50,196 @@ async function use_mcp_tool(args: {
 describe("Calculator MCP Server with Decimal.js", () => {
   describe("Trigonometric Functions", () => {
     // Basic trigonometric functions
-    test("should calculate sine correctly", async () => {
+    test("should calculate sine correctly for an array of angles", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "sin",
-        arguments: { angle: Math.PI / 2, mode: "radians" },
+        arguments: { angles: [Math.PI / 2, 0] },
       });
-      expect(result).toBe("1");
+      expect(result).toBe(JSON.stringify(["1", "0"]));
     });
 
-    test("should calculate cosine correctly", async () => {
+    test("should calculate cosine correctly for an array of angles", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "cos",
-        arguments: { angle: 0, mode: "radians" },
+        arguments: { angles: [0, Math.PI] },
       });
-      expect(result).toBe("1");
+      expect(result).toBe(JSON.stringify(["1", "-1"]));
     });
 
-    test("should calculate tangent correctly", async () => {
+    test("should calculate tangent correctly for an array of angles", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "tan",
-        arguments: { angle: Math.PI / 4, mode: "radians" },
+        arguments: { angles: [Math.PI / 4, 0] },
       });
-      expect(result).toBe("1");
+      expect(result).toBe(JSON.stringify(["1", "0"]));
     });
 
     // Inverse trigonometric functions
-    test("should calculate arcsine correctly", async () => {
+    test("should calculate arcsine correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "asin",
-        arguments: { value: 1 },
+        arguments: { values: [1, 0] },
       });
-      expect(result).toBe("1.570796326794897");
+      expect(result).toBe(JSON.stringify(["1.570796326794897", "0"]));
     });
 
-    test("should calculate arccosine correctly", async () => {
+    test("should calculate arccosine correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "acos",
-        arguments: { value: 0 },
+        arguments: { values: [0, 1] },
       });
-      expect(result).toBe("1.570796326794897");
+      expect(result).toBe(JSON.stringify(["1.570796326794897", "0"]));
     });
 
-    test("should calculate arctangent correctly", async () => {
+    test("should calculate arctangent correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "atan",
-        arguments: { value: 1 },
+        arguments: { values: [1, 0] },
       });
-      expect(result).toBe("0.785398163397448");
+      expect(result).toBe(JSON.stringify(["0.785398163397448", "0"]));
     });
 
     // Hyperbolic functions
-    test("should calculate hyperbolic sine correctly", async () => {
+    test("should calculate hyperbolic sine correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "sinh",
-        arguments: { value: 0 },
+        arguments: { values: [0, 1] },
       });
-      expect(result).toBe("0");
+      expect(result).toBe(JSON.stringify(["0", "1.175201193643801"]));
     });
 
-    test("should calculate hyperbolic cosine correctly", async () => {
+    test("should calculate hyperbolic cosine correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "cosh",
-        arguments: { value: 0 },
+        arguments: { values: [0, 1] },
       });
-      expect(result).toBe("1");
+      expect(result).toBe(JSON.stringify(["1", "1.543080634815244"]));
     });
 
-    test("should calculate hyperbolic tangent correctly", async () => {
+    test("should calculate hyperbolic tangent correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "tanh",
-        arguments: { value: 0 },
+        arguments: { values: [0, 1] },
       });
-      expect(result).toBe("0");
+      expect(result).toBe(JSON.stringify(["0", "0.761594155955765"]));
     });
 
     // Inverse hyperbolic functions
-    test("should calculate inverse hyperbolic sine correctly", async () => {
+    test("should calculate inverse hyperbolic sine correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "asinh",
-        arguments: { value: 0 },
+        arguments: { values: [0, 1] },
       });
-      expect(result).toBe("0");
+      expect(result).toBe(JSON.stringify(["0", "0.881373587019543"]));
     });
 
-    test("should calculate inverse hyperbolic cosine correctly", async () => {
+    test("should calculate inverse hyperbolic cosine correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "acosh",
-        arguments: { value: 1 },
+        arguments: { values: [1, 2] },
       });
-      expect(result).toBe("0");
+      expect(result).toBe(JSON.stringify(["0", "1.316957896924817"]));
     });
 
-    test("should calculate inverse hyperbolic tangent correctly", async () => {
+    test("should calculate inverse hyperbolic tangent correctly for an array of values", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "atanh",
-        arguments: { value: 0 },
+        arguments: { values: [0, 0.5] },
       });
-      expect(result).toBe("0");
+      expect(result).toBe(JSON.stringify(["0", "0.549306144334055"]));
     });
 
     // Special cases and error handling
-    test("should handle invalid domain for arcsine", async () => {
+    test("should handle invalid domain for arcsine in an array", async () => {
       await expect(
         use_mcp_tool({
           server_name: "Calculator",
           tool_name: "asin",
-          arguments: { value: 2 },
+          arguments: { values: [0.5, 2] },
         })
       ).rejects.toThrow("Domain error: input value must be between -1 and 1");
     });
 
-    test("should handle degree mode correctly", async () => {
+    test("should handle degree mode correctly for an array of angles", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "sin",
-        arguments: { angle: 90, mode: "degrees" },
+        arguments: { angles: [90, 30], mode: "degrees" },
       });
-      expect(result).toBe("1");
+      expect(result).toBe(JSON.stringify(["1", "0.5"]));
     });
 
-    test("should handle special angles correctly", async () => {
+    test("should handle special angles correctly for an array of angles", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "cos",
-        arguments: { angle: 60, mode: "degrees" },
+        arguments: { angles: [60, 45], mode: "degrees" },
       });
-      expect(result).toBe("0.5");
+      expect(result).toBe(JSON.stringify(["0.5", "0.707106781186548"]));
+    });
+
+    test("should handle undefined tangent for an array of angles", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "tan",
+        arguments: { angles: [Math.PI / 2, Math.PI / 4], mode: "radians" },
+      });
+      expect(result).toBe(
+        JSON.stringify(["Undefined (angle is π/2 + nπ)", "1"])
+      );
+    });
+
+    test("should handle invalid domain for acosh in an array", async () => {
+      await expect(
+        use_mcp_tool({
+          server_name: "Calculator",
+          tool_name: "acosh",
+          arguments: { values: [0.5, 1] },
+        })
+      ).rejects.toThrow(
+        "Domain error: input value must be greater than or equal to 1"
+      );
+    });
+
+    test("should handle invalid domain for atanh in an array", async () => {
+      await expect(
+        use_mcp_tool({
+          server_name: "Calculator",
+          tool_name: "atanh",
+          arguments: { values: [0.5, 1] },
+        })
+      ).rejects.toThrow("Domain error: input value must be between -1 and 1");
+    });
+
+    test("should handle radians mode explicitly", async () => {
+      const result = await use_mcp_tool({
+        server_name: "Calculator",
+        tool_name: "sin",
+        arguments: { angles: [Math.PI / 2], mode: "radians" },
+      });
+      expect(result).toBe(JSON.stringify(["1"]));
+    });
+
+    test("should throw an error for an empty angles array", async () => {
+      await expect(
+        use_mcp_tool({
+          server_name: "Calculator",
+          tool_name: "sin",
+          arguments: { angles: [] },
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -251,7 +301,7 @@ describe("Calculator MCP Server with Decimal.js", () => {
         tool_name: "subtract",
         arguments: { numbers: [] },
       })
-    ).rejects.toThrow("Subtraction requires at least one number");
+    ).rejects.toThrow("Array must contain at least 2 element(s)");
   });
 
   test("should handle insufficient numbers for division", async () => {
@@ -261,7 +311,7 @@ describe("Calculator MCP Server with Decimal.js", () => {
         tool_name: "divide",
         arguments: { numbers: [10] },
       })
-    ).rejects.toThrow("Division requires at least two numbers");
+    ).rejects.toThrow("Array must contain at least 2 element(s)");
   });
 
   test("should correctly set and use precision", async () => {

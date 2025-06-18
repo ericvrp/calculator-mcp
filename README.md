@@ -6,51 +6,32 @@ A TypeScript-based MCP server that implements a robust calculator with precise d
 
 ### Tools
 
-- `add` - Adds an array of numbers
-  - Takes `numbers` parameter as array of numbers to add
-  - Returns sum with configured precision
-- `subtract` - Subtracts an array of numbers sequentially
-  - Takes `numbers` parameter as array of numbers to subtract
-  - Requires at least one number
-  - Returns result of subtracting each subsequent number from the first
-- `multiply` - Multiplies an array of numbers
-  - Takes `numbers` parameter as array of numbers to multiply
-  - Returns product with configured precision
-- `divide` - Divides numbers sequentially
-  - Takes `numbers` parameter as array of numbers to divide
-  - Requires at least two numbers
-  - Returns result of dividing first number by all subsequent numbers
-  - Handles division by zero gracefully
-- `set_precision` - Configures decimal precision
-  - Takes `precision` parameter as number of decimal places to use
-  - Affects precision of all subsequent calculations
-- `sin` - Sine function
-  - Takes `angle` parameter as the angle value
-  - Takes `mode` parameter as the angle mode (radians or degrees)
-- `cos` - Cosine function
-  - Takes `angle` parameter as the angle value
-  - Takes `mode` parameter as the angle mode (radians or degrees)
-- `tan` - Tangent function
-  - Takes `angle` parameter as the angle value
-  - Takes `mode` parameter as the angle mode (radians or degrees)
-- `asin` - Arc sine function
-  - Takes `value` parameter as the value to calculate arcsine for
-- `acos` - Arc cosine function
-  - Takes `value` parameter as the value to calculate arccosine for
-- `atan` - Arc tangent function
-  - Takes `value` parameter as the value to calculate arctangent for
-- `sinh` - Hyperbolic sine function
-  - Takes `value` parameter as the value to calculate hyperbolic sine for
-- `cosh` - Hyperbolic cosine function
-  - Takes `value` parameter as the value to calculate hyperbolic cosine for
-- `tanh` - Hyperbolic tangent function
-  - Takes `value` parameter as the value to calculate hyperbolic tangent for
-- `asinh` - Inverse hyperbolic sine function
-  - Takes `value` parameter as the value to calculate inverse hyperbolic sine for
-- `acosh` - Inverse hyperbolic cosine function
-  - Takes `value` parameter as the value to calculate inverse hyperbolic cosine for
-- `atanh` - Inverse hyperbolic tangent function
-  - Takes `value` parameter as the value to calculate inverse hyperbolic tangent for
+#### Arithmetic Functions
+
+These functions take an array of at least two numbers and return a single numerical result.
+
+- `add` - Adds an array of numbers.
+- `subtract` - Subtracts numbers sequentially from the first.
+- `multiply` - Multiplies an array of numbers.
+- `divide` - Divides numbers sequentially. Handles division by zero.
+
+#### Trigonometric Functions
+
+These functions operate on arrays of numbers and return an array of results. The `angles` input requires at least one number.
+
+- **Basic Trigonometry**: `sin`, `cos`, `tan`
+  - Input: `angles` (array of numbers), `mode` ('radians' or 'degrees', defaults to 'radians').
+- **Inverse Trigonometry**: `asin`, `acos`, `atan`
+  - Input: `values` (array of numbers).
+- **Hyperbolic Functions**: `sinh`, `cosh`, `tanh`
+  - Input: `values` (array of numbers).
+- **Inverse Hyperbolic Functions**: `asinh`, `acosh`, `atanh`
+  - Input: `values` (array of numbers).
+
+#### Miscellaneous
+
+- `set_precision` - Configures decimal precision for all subsequent calculations.
+  - Takes `precision` parameter as the number of decimal places.
 
 ## Development
 

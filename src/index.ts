@@ -4,6 +4,22 @@ import { z } from "zod";
 import { version } from "../package.json";
 import { Decimal } from "decimal.js";
 
+// Define shared Zod schemas for DRY principle
+const NumbersArraySchema = z
+  .array(z.number())
+  .min(2)
+  .describe("An array of numbers (minimum 2)");
+
+const AnglesArraySchema = z
+  .array(z.number())
+  .describe("An array of angle values");
+
+const ModeEnumSchema = z
+  .enum(["radians", "degrees"])
+  .describe("The angle mode (radians or degrees)");
+
+const ValuesArraySchema = z.array(z.number()).describe("An array of values");
+
 /**
  * Convert degrees to radians
  */
@@ -30,10 +46,7 @@ const server = new McpServer({
 server.tool(
   "add",
   {
-    numbers: z
-      .array(z.number())
-      .min(2)
-      .describe("An array of numbers to add (minimum 2)"),
+    numbers: NumbersArraySchema,
   },
   async ({ numbers }) => {
     let result = new Decimal(0);
@@ -50,10 +63,7 @@ server.tool(
 server.tool(
   "subtract",
   {
-    numbers: z
-      .array(z.number())
-      .min(2)
-      .describe("An array of numbers to subtract (minimum 2)"),
+    numbers: NumbersArraySchema,
   },
   async ({ numbers }) => {
     if (numbers.length === 0) {
@@ -74,10 +84,7 @@ server.tool(
 server.tool(
   "multiply",
   {
-    numbers: z
-      .array(z.number())
-      .min(2)
-      .describe("An array of numbers to multiply (minimum 2)"),
+    numbers: NumbersArraySchema,
   },
   async ({ numbers }) => {
     let result = new Decimal(1);
@@ -94,10 +101,7 @@ server.tool(
 server.tool(
   "divide",
   {
-    numbers: z
-      .array(z.number())
-      .min(2)
-      .describe("An array of numbers to divide (minimum 2)"),
+    numbers: NumbersArraySchema,
   },
   async ({ numbers }) => {
     if (numbers.length < 2) {
@@ -131,10 +135,8 @@ server.tool(
 server.tool(
   "sin",
   {
-    angles: z.array(z.number()).describe("An array of angle values"),
-    mode: z
-      .enum(["radians", "degrees"])
-      .describe("The angle mode (radians or degrees)"),
+    angles: AnglesArraySchema,
+    mode: ModeEnumSchema,
   },
   async ({ angles, mode }) => {
     const results = angles.map((angle) => {
@@ -152,10 +154,8 @@ server.tool(
 server.tool(
   "cos",
   {
-    angles: z.array(z.number()).describe("An array of angle values"),
-    mode: z
-      .enum(["radians", "degrees"])
-      .describe("The angle mode (radians or degrees)"),
+    angles: AnglesArraySchema,
+    mode: ModeEnumSchema,
   },
   async ({ angles, mode }) => {
     const results = angles.map((angle) => {
@@ -173,10 +173,8 @@ server.tool(
 server.tool(
   "tan",
   {
-    angles: z.array(z.number()).describe("An array of angle values"),
-    mode: z
-      .enum(["radians", "degrees"])
-      .describe("The angle mode (radians or degrees)"),
+    angles: AnglesArraySchema,
+    mode: ModeEnumSchema,
   },
   async ({ angles, mode }) => {
     const results = angles.map((angle) => {
@@ -211,9 +209,7 @@ function roundTrigResult(value: Decimal): Decimal {
 server.tool(
   "asin",
   {
-    values: z
-      .array(z.number())
-      .describe("An array of values to calculate arcsine for"),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -232,9 +228,7 @@ server.tool(
 server.tool(
   "acos",
   {
-    values: z
-      .array(z.number())
-      .describe("An array of values to calculate arccosine for"),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -253,9 +247,7 @@ server.tool(
 server.tool(
   "atan",
   {
-    values: z
-      .array(z.number())
-      .describe("An array of values to calculate arctangent for"),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -271,9 +263,7 @@ server.tool(
 server.tool(
   "sinh",
   {
-    values: z
-      .array(z.number())
-      .describe("An array of values to calculate hyperbolic sine for"),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -289,9 +279,7 @@ server.tool(
 server.tool(
   "cosh",
   {
-    values: z
-      .array(z.number())
-      .describe("An array of values to calculate hyperbolic cosine for"),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -307,9 +295,7 @@ server.tool(
 server.tool(
   "tanh",
   {
-    values: z
-      .array(z.number())
-      .describe("An array of values to calculate hyperbolic tangent for"),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -325,9 +311,7 @@ server.tool(
 server.tool(
   "asinh",
   {
-    values: z
-      .array(z.number())
-      .describe("An array of values to calculate inverse hyperbolic sine for"),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -343,11 +327,7 @@ server.tool(
 server.tool(
   "acosh",
   {
-    values: z
-      .array(z.number())
-      .describe(
-        "An array of values to calculate inverse hyperbolic cosine for"
-      ),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {
@@ -368,11 +348,7 @@ server.tool(
 server.tool(
   "atanh",
   {
-    values: z
-      .array(z.number())
-      .describe(
-        "An array of values to calculate inverse hyperbolic tangent for"
-      ),
+    values: ValuesArraySchema,
   },
   async ({ values }) => {
     const results = values.map((value) => {

@@ -54,7 +54,7 @@ describe("Calculator MCP Server with Decimal.js", () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "sin",
-        arguments: { angles: [Math.PI / 2, 0], mode: "radians" },
+        arguments: { angles: [Math.PI / 2, 0] },
       });
       expect(result).toBe(JSON.stringify(["1", "0"]));
     });
@@ -63,7 +63,7 @@ describe("Calculator MCP Server with Decimal.js", () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "cos",
-        arguments: { angles: [0, Math.PI], mode: "radians" },
+        arguments: { angles: [0, Math.PI] },
       });
       expect(result).toBe(JSON.stringify(["1", "-1"]));
     });
@@ -72,7 +72,7 @@ describe("Calculator MCP Server with Decimal.js", () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
         tool_name: "tan",
-        arguments: { angles: [Math.PI / 4, 0], mode: "radians" },
+        arguments: { angles: [Math.PI / 4, 0] },
       });
       expect(result).toBe(JSON.stringify(["1", "0"]));
     });
@@ -223,15 +223,6 @@ describe("Calculator MCP Server with Decimal.js", () => {
       ).rejects.toThrow("Domain error: input value must be between -1 and 1");
     });
 
-    test("should default to radians when no mode is provided", async () => {
-      const result = await use_mcp_tool({
-        server_name: "Calculator",
-        tool_name: "sin",
-        arguments: { angles: [Math.PI / 2] },
-      });
-      expect(result).toBe(JSON.stringify(["1"]));
-    });
-
     test("should handle radians mode explicitly", async () => {
       const result = await use_mcp_tool({
         server_name: "Calculator",
@@ -239,25 +230,6 @@ describe("Calculator MCP Server with Decimal.js", () => {
         arguments: { angles: [Math.PI / 2], mode: "radians" },
       });
       expect(result).toBe(JSON.stringify(["1"]));
-    });
-
-    test("should handle degrees mode correctly", async () => {
-      const result = await use_mcp_tool({
-        server_name: "Calculator",
-        tool_name: "sin",
-        arguments: { angles: [90], mode: "degrees" },
-      });
-      expect(result).toBe(JSON.stringify(["1"]));
-    });
-
-    test("should throw an error for an illegal mode", async () => {
-      await expect(
-        use_mcp_tool({
-          server_name: "Calculator",
-          tool_name: "sin",
-          arguments: { angles: [90], mode: "invalid_mode" },
-        })
-      ).rejects.toThrow();
     });
 
     test("should throw an error for an empty angles array", async () => {

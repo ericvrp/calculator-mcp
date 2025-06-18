@@ -1,23 +1,29 @@
 # Calculator MCP Server
 
-A simple calculator MCP server that provides basic arithmetic tools.
-
-This is a TypeScript-based MCP server that implements a simple calculator. It demonstrates core MCP concepts by providing:
-
-- Tools for performing arithmetic operations
+A TypeScript-based MCP server that implements a robust calculator with precise decimal arithmetic. This server demonstrates core MCP concepts by providing arithmetic operations with support for multiple operands and configurable precision using Decimal.js.
 
 ## Features
 
 ### Tools
 
-- `add` - Adds two numbers
-  - Takes `a` and `b` as required number parameters
-- `subtract` - Subtracts two numbers
-  - Takes `a` and `b` as required number parameters
-- `multiply` - Multiplies two numbers
-  - Takes `a` and `b` as required number parameters
-- `divide` - Divides two numbers
-  - Takes `a` (numerator) and `b` (denominator) as required number parameters
+- `add` - Adds an array of numbers
+  - Takes `numbers` parameter as array of numbers to add
+  - Returns sum with configured precision
+- `subtract` - Subtracts an array of numbers sequentially
+  - Takes `numbers` parameter as array of numbers to subtract
+  - Requires at least one number
+  - Returns result of subtracting each subsequent number from the first
+- `multiply` - Multiplies an array of numbers
+  - Takes `numbers` parameter as array of numbers to multiply
+  - Returns product with configured precision
+- `divide` - Divides numbers sequentially
+  - Takes `numbers` parameter as array of numbers to divide
+  - Requires at least two numbers
+  - Returns result of dividing first number by all subsequent numbers
+  - Handles division by zero gracefully
+- `set_precision` - Configures decimal precision
+  - Takes `precision` parameter as number of decimal places to use
+  - Affects precision of all subsequent calculations
 
 ## Development
 
@@ -27,13 +33,13 @@ Install dependencies:
 bun install
 ```
 
-For development with auto-rebuild:
+Run the development server:
 
 ```bash
-bun run watch
+bun start
 ```
 
-## Installation
+## Installation as standalone MCP server
 
 To use with Claude Desktop, add the server config:
 
@@ -48,6 +54,59 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
     }
   }
 }
+```
+
+Or for Cline VSCode extension, add a modified version of this to your MCP config file:
+
+```json
+   "Calculator": {
+      "autoApprove": [
+        "add",
+        "subtract",
+        "multiply",
+        "divide",
+        "set_precision"
+      ],
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "bun",
+      "args": [
+        "/path-to-your/calculator-mcp/src/index.ts"
+      ]
+    }
+```
+
+## Installation using Docker
+
+To run the MCP server using Docker, you should first build the image using:
+
+```bash
+docker build -t calculator-mcp .
+```
+
+Followed by adding this to the (Cline) MCP config file:
+
+```json
+    "Calculator (docker)": {
+      "autoApprove": [
+        "add",
+        "subtract",
+        "multiply",
+        "divide",
+        "set_precision"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "calculator-mcp"
+      ]
+    }
 ```
 
 ### Debugging

@@ -17,10 +17,10 @@ These functions take an array of at least two numbers and return a single numeri
 
 #### Trigonometric Functions
 
-These functions operate on arrays of numbers and return an array of results.
+These functions operate on arrays of numbers and return an array of results. The `angles` input requires at least one number.
 
 - **Basic Trigonometry**: `sin`, `cos`, `tan`
-  - Input: `angles` (array of numbers), `mode` ('radians' or 'degrees').
+  - Input: `angles` (array of numbers), `mode` ('radians' or 'degrees', defaults to 'radians').
 - **Inverse Trigonometry**: `asin`, `acos`, `atan`
   - Input: `values` (array of numbers).
 - **Hyperbolic Functions**: `sinh`, `cosh`, `tanh`

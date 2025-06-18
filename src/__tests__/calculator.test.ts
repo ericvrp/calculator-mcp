@@ -259,6 +259,16 @@ describe("Calculator MCP Server with Decimal.js", () => {
         })
       ).rejects.toThrow();
     });
+
+    test("should throw an error for an empty angles array", async () => {
+      await expect(
+        use_mcp_tool({
+          server_name: "Calculator",
+          tool_name: "sin",
+          arguments: { angles: [] },
+        })
+      ).rejects.toThrow();
+    });
   });
 
   // Reset precision before each test

@@ -24,6 +24,33 @@ A TypeScript-based MCP server that implements a robust calculator with precise d
 - `set_precision` - Configures decimal precision
   - Takes `precision` parameter as number of decimal places to use
   - Affects precision of all subsequent calculations
+- `sin` - Sine function
+  - Takes `angle` parameter as the angle value
+  - Takes `mode` parameter as the angle mode (radians or degrees)
+- `cos` - Cosine function
+  - Takes `angle` parameter as the angle value
+  - Takes `mode` parameter as the angle mode (radians or degrees)
+- `tan` - Tangent function
+  - Takes `angle` parameter as the angle value
+  - Takes `mode` parameter as the angle mode (radians or degrees)
+- `asin` - Arc sine function
+  - Takes `value` parameter as the value to calculate arcsine for
+- `acos` - Arc cosine function
+  - Takes `value` parameter as the value to calculate arccosine for
+- `atan` - Arc tangent function
+  - Takes `value` parameter as the value to calculate arctangent for
+- `sinh` - Hyperbolic sine function
+  - Takes `value` parameter as the value to calculate hyperbolic sine for
+- `cosh` - Hyperbolic cosine function
+  - Takes `value` parameter as the value to calculate hyperbolic cosine for
+- `tanh` - Hyperbolic tangent function
+  - Takes `value` parameter as the value to calculate hyperbolic tangent for
+- `asinh` - Inverse hyperbolic sine function
+  - Takes `value` parameter as the value to calculate inverse hyperbolic sine for
+- `acosh` - Inverse hyperbolic cosine function
+  - Takes `value` parameter as the value to calculate inverse hyperbolic cosine for
+- `atanh` - Inverse hyperbolic tangent function
+  - Takes `value` parameter as the value to calculate inverse hyperbolic tangent for
 
 ## Development
 

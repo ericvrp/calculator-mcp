@@ -30,7 +30,10 @@ const server = new McpServer({
 server.tool(
   "add",
   {
-    numbers: z.array(z.number()).describe("An array of numbers to add"),
+    numbers: z
+      .array(z.number())
+      .min(2)
+      .describe("An array of numbers to add (minimum 2)"),
   },
   async ({ numbers }) => {
     let result = new Decimal(0);
@@ -47,7 +50,10 @@ server.tool(
 server.tool(
   "subtract",
   {
-    numbers: z.array(z.number()).describe("An array of numbers to subtract"),
+    numbers: z
+      .array(z.number())
+      .min(2)
+      .describe("An array of numbers to subtract (minimum 2)"),
   },
   async ({ numbers }) => {
     if (numbers.length === 0) {
@@ -68,7 +74,10 @@ server.tool(
 server.tool(
   "multiply",
   {
-    numbers: z.array(z.number()).describe("An array of numbers to multiply"),
+    numbers: z
+      .array(z.number())
+      .min(2)
+      .describe("An array of numbers to multiply (minimum 2)"),
   },
   async ({ numbers }) => {
     let result = new Decimal(1);
@@ -85,7 +94,10 @@ server.tool(
 server.tool(
   "divide",
   {
-    numbers: z.array(z.number()).describe("An array of numbers to divide"),
+    numbers: z
+      .array(z.number())
+      .min(2)
+      .describe("An array of numbers to divide (minimum 2)"),
   },
   async ({ numbers }) => {
     if (numbers.length < 2) {
@@ -119,17 +131,19 @@ server.tool(
 server.tool(
   "sin",
   {
-    angle: z.number().describe("The angle value"),
+    angles: z.array(z.number()).describe("An array of angle values"),
     mode: z
       .enum(["radians", "degrees"])
       .describe("The angle mode (radians or degrees)"),
   },
-  async ({ angle, mode }) => {
-    let angleInRadians =
-      mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
-    const result = roundTrigResult(Decimal.sin(angleInRadians));
+  async ({ angles, mode }) => {
+    const results = angles.map((angle) => {
+      let angleInRadians =
+        mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
+      return roundTrigResult(Decimal.sin(angleInRadians)).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -138,17 +152,19 @@ server.tool(
 server.tool(
   "cos",
   {
-    angle: z.number().describe("The angle value"),
+    angles: z.array(z.number()).describe("An array of angle values"),
     mode: z
       .enum(["radians", "degrees"])
       .describe("The angle mode (radians or degrees)"),
   },
-  async ({ angle, mode }) => {
-    let angleInRadians =
-      mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
-    const result = roundTrigResult(Decimal.cos(angleInRadians));
+  async ({ angles, mode }) => {
+    const results = angles.map((angle) => {
+      let angleInRadians =
+        mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
+      return roundTrigResult(Decimal.cos(angleInRadians)).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -157,27 +173,29 @@ server.tool(
 server.tool(
   "tan",
   {
-    angle: z.number().describe("The angle value"),
+    angles: z.array(z.number()).describe("An array of angle values"),
     mode: z
       .enum(["radians", "degrees"])
       .describe("The angle mode (radians or degrees)"),
   },
-  async ({ angle, mode }) => {
-    let angleInRadians =
-      mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
-    const cos = Decimal.cos(angleInRadians);
+  async ({ angles, mode }) => {
+    const results = angles.map((angle) => {
+      let angleInRadians =
+        mode === "degrees" ? degreesToRadians(angle) : new Decimal(angle);
+      const cos = Decimal.cos(angleInRadians);
 
-    // Check for undefined tangent at π/2 + nπ
-    if (cos.isZero()) {
-      return {
-        content: [{ type: "text", text: "Undefined (angle is π/2 + nπ)" }],
-      };
-    }
+      // Check for undefined tangent at π/2 + nπ
+      // Use a small epsilon to account for floating point inaccuracies
+      const EPSILON = new Decimal("1e-15"); // Define a small epsilon
+      if (cos.abs().lessThan(EPSILON)) {
+        return "Undefined (angle is π/2 + nπ)";
+      }
 
-    const sin = Decimal.sin(angleInRadians);
-    const result = roundTrigResult(sin.dividedBy(cos));
+      const sin = Decimal.sin(angleInRadians);
+      return roundTrigResult(sin.dividedBy(cos)).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -193,15 +211,19 @@ function roundTrigResult(value: Decimal): Decimal {
 server.tool(
   "asin",
   {
-    value: z.number().describe("The value to calculate arcsine for"),
+    values: z
+      .array(z.number())
+      .describe("An array of values to calculate arcsine for"),
   },
-  async ({ value }) => {
-    if (Math.abs(value) > 1) {
-      throw new Error("Domain error: input value must be between -1 and 1");
-    }
-    const result = roundTrigResult(Decimal.asin(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      if (Math.abs(value) > 1) {
+        throw new Error("Domain error: input value must be between -1 and 1");
+      }
+      return roundTrigResult(Decimal.asin(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -210,15 +232,19 @@ server.tool(
 server.tool(
   "acos",
   {
-    value: z.number().describe("The value to calculate arccosine for"),
+    values: z
+      .array(z.number())
+      .describe("An array of values to calculate arccosine for"),
   },
-  async ({ value }) => {
-    if (Math.abs(value) > 1) {
-      throw new Error("Domain error: input value must be between -1 and 1");
-    }
-    const result = roundTrigResult(Decimal.acos(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      if (Math.abs(value) > 1) {
+        throw new Error("Domain error: input value must be between -1 and 1");
+      }
+      return roundTrigResult(Decimal.acos(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -227,12 +253,16 @@ server.tool(
 server.tool(
   "atan",
   {
-    value: z.number().describe("The value to calculate arctangent for"),
+    values: z
+      .array(z.number())
+      .describe("An array of values to calculate arctangent for"),
   },
-  async ({ value }) => {
-    const result = roundTrigResult(Decimal.atan(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      return roundTrigResult(Decimal.atan(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -241,12 +271,16 @@ server.tool(
 server.tool(
   "sinh",
   {
-    value: z.number().describe("The value to calculate hyperbolic sine for"),
+    values: z
+      .array(z.number())
+      .describe("An array of values to calculate hyperbolic sine for"),
   },
-  async ({ value }) => {
-    const result = roundTrigResult(Decimal.sinh(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      return roundTrigResult(Decimal.sinh(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -255,12 +289,16 @@ server.tool(
 server.tool(
   "cosh",
   {
-    value: z.number().describe("The value to calculate hyperbolic cosine for"),
+    values: z
+      .array(z.number())
+      .describe("An array of values to calculate hyperbolic cosine for"),
   },
-  async ({ value }) => {
-    const result = roundTrigResult(Decimal.cosh(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      return roundTrigResult(Decimal.cosh(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -269,12 +307,16 @@ server.tool(
 server.tool(
   "tanh",
   {
-    value: z.number().describe("The value to calculate hyperbolic tangent for"),
+    values: z
+      .array(z.number())
+      .describe("An array of values to calculate hyperbolic tangent for"),
   },
-  async ({ value }) => {
-    const result = roundTrigResult(Decimal.tanh(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      return roundTrigResult(Decimal.tanh(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -283,14 +325,16 @@ server.tool(
 server.tool(
   "asinh",
   {
-    value: z
-      .number()
-      .describe("The value to calculate inverse hyperbolic sine for"),
+    values: z
+      .array(z.number())
+      .describe("An array of values to calculate inverse hyperbolic sine for"),
   },
-  async ({ value }) => {
-    const result = Decimal.asinh(new Decimal(value));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      return roundTrigResult(Decimal.asinh(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -299,19 +343,23 @@ server.tool(
 server.tool(
   "acosh",
   {
-    value: z
-      .number()
-      .describe("The value to calculate inverse hyperbolic cosine for"),
+    values: z
+      .array(z.number())
+      .describe(
+        "An array of values to calculate inverse hyperbolic cosine for"
+      ),
   },
-  async ({ value }) => {
-    if (value < 1) {
-      throw new Error(
-        "Domain error: input value must be greater than or equal to 1"
-      );
-    }
-    const result = roundTrigResult(Decimal.acosh(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      if (value < 1) {
+        throw new Error(
+          "Domain error: input value must be greater than or equal to 1"
+        );
+      }
+      return roundTrigResult(Decimal.acosh(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
@@ -320,17 +368,21 @@ server.tool(
 server.tool(
   "atanh",
   {
-    value: z
-      .number()
-      .describe("The value to calculate inverse hyperbolic tangent for"),
+    values: z
+      .array(z.number())
+      .describe(
+        "An array of values to calculate inverse hyperbolic tangent for"
+      ),
   },
-  async ({ value }) => {
-    if (Math.abs(value) >= 1) {
-      throw new Error("Domain error: input value must be between -1 and 1");
-    }
-    const result = roundTrigResult(Decimal.atanh(new Decimal(value)));
+  async ({ values }) => {
+    const results = values.map((value) => {
+      if (Math.abs(value) >= 1) {
+        throw new Error("Domain error: input value must be between -1 and 1");
+      }
+      return roundTrigResult(Decimal.atanh(new Decimal(value))).toString();
+    });
     return {
-      content: [{ type: "text", text: result.toString() }],
+      content: [{ type: "text", text: JSON.stringify(results) }],
     };
   }
 );
